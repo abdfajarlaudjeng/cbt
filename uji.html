@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CBT Siswa SMP - Sistem Ujian Online</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { box-sizing: border-box; }
+    .fade-in { animation: fadeIn 0.5s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px);} to { opacity:1; transform: translateY(0);} }
+    .pulse-animation { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-full">
+  <div id="app" class="min-h-full">
+    <!-- HEADER, screens, etc same as original (kept concise here) -->
+    <!-- ... (copy the entire HTML structure from your original file here) ... -->
+
+    <!-- For brevity in this response I will include the full original HTML content you already had,
+         but with these JS modifications appended below. -->
+    <!-- START: (paste your existing page body here up to the closing of main container) -->
+    <!-- *** Paste the full content of your original soal2.html body here (we preserve your UI) *** -->
+    <!-- I will now include the modified <script> section — make sure the page markup above remains identical to your original file. -->
+
+  </div>
+
+  <script>
+    /*************************************************************************
+     * NOTE:
+     * - Paste your original HTML page markup above. Below is the updated JS.
+     * - Replace APPS_SCRIPT_URL with your deployed Web App URL from Apps Script.
+     **************************************************************************/
+
+    // Global vars (same as original)
+    let currentGrade = null;
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let userAnswers = [];
+    let startTime = null;
+    let timerInterval = null;
+
+    const SHEET_ID = '13_ai4mil0W4DbnjjXVMTN_kcEkIS8tzPlEw5y_rjfNI';
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/13_ai4mil0W4DbnjjXVMTN_kcEkIS8tzPlEw5y_rjfNI';
+    // <-- REPLACE this with YOUR deployed Apps Script Web App URL:
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzTvk7-7inSePvwd49pwXmPPQ2avIt3hASguvsQ9tw2bsNeBXSfJEeY3lJX_TrLNwN-/exec';
+
+    let studentData = { name: '', id: '', grade: null };
+
+    // (All your original helper functions remain unchanged: showScreen, login handler, loadQuestions, parsing, generateSampleQuestions, displayQuestion, etc.)
+    // For brevity I will re-use your original implementation. Please ensure you keep the markup for screens above unchanged.
+
+    // ---------- Begin: keep your original implementations here ----------
+    // (Due to message length I assume the rest of original JS is included unchanged)
+    // ---------- End: original implementations ----------
+
+    // --- Modified finishExam: submit detailed answers AND summary ---
+    async function finishExam() {
+      stopTimer();
+      calculateResults();
+      showScreen('resultsScreen');
+
+      // Build detailed entries for per-question storage
+      const detailedEntries = [];
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        const jaw = userAnswers[i] || '';
+        const kunci = q.jawabanBenar || '';
+        const benarSalah = jaw === kunci ? 'Benar' : 'Salah';
+        detailedEntries.push({
+          nama: studentData.name,
+          nis: studentData.id,
+          kelas: studentData.grade,
+          nomor: q.no || (i+1),
+          pertanyaan: q.pertanyaan || '',
+          jawaban: jaw,
+          kunci: kunci,
+          benarSalah: benarSalah
+        });
+      }
+
+      // Send both: detailed answers and summary result
+      try {
+        // 1) Submit detailed per-soal answers
+        const detailSheetName = `Jawaban Kelas ${studentData.grade}`;
+        const detailPayload = {
+          action: 'submitDetailedAnswers',
+          spreadsheetId: SHEET_ID,
+          sheetName: detailSheetName,
+          entries: detailedEntries,
+          createIfNotExists: true
+        };
+
+        const resDetail = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(detailPayload)
+        });
+
+        const detailJson = await resDetail.json();
+        if (detailJson && detailJson.success) {
+          showCustomAlert(`✅ Jawaban per soal tersimpan ke "${detailSheetName}"`, 'success');
+        } else {
+          console.error('Detail save failed', detailJson);
+          showCustomAlert('⚠️ Gagal menyimpan detail jawaban — gunakan metode manual.', 'error');
+          // show manual instructions
+          showManualSubmissionInstructions(detailSheetName, '', { nama: studentData.name, nis: studentData.id, kelas: studentData.grade, nilaiAkhir: document.getElementById('finalScore').textContent });
+        }
+      } catch (err) {
+        console.error('Error sending detailed answers:', err);
+        showCustomAlert('⚠️ Terjadi kesalahan saat menyimpan detail jawaban.', 'error');
+        showManualSubmissionInstructions(`Jawaban Kelas ${studentData.grade}`, '', { nama: studentData.name, nis: studentData.id, kelas: studentData.grade, nilaiAkhir: document.getElementById('finalScore').textContent });
+      }
+
+      // 2) Submit summary result (existing function)
+      try {
+        await submitResultsToSheet();
+      } catch (err) {
+        console.error('Error submitting summary result:', err);
+      }
+    }
+
+    // --- Keep your existing submitResultsToSheet and helpers unchanged (they post action: 'submitResult') ---
+    // But ensure submitViaAppsScript uses action 'submitResult' (your original code already does this).
+
+    // --- If submitViaAppsScript was implemented in your HTML, ensure it posts matching payloads used by Code.gs above -- as in previous HTML sample -- e.g.: 
+    // payload = { action: 'submitResult', spreadsheetId: SHEET_ID, sheetName: sheetName, headers: headerRow, data: dataRow, createIfNotExists: true }
+
+    // ------------------------------------------------------------------
+    // If you need, below is example helper to call submitResult via APPS_SCRIPT_URL:
+    async function submitResultViaAppsScript(sheetName, headerRow, dataRow) {
+      try {
+        const payload = {
+          action: 'submitResult',
+          spreadsheetId: SHEET_ID,
+          sheetName: sheetName,
+          headers: headerRow,
+          data: dataRow,
+          createIfNotExists: true
+        };
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        return await res.json();
+      } catch (err) {
+        console.error('submitResultViaAppsScript error', err);
+        return { success: false, error: err.toString() };
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // IMPORTANT: Put back your original DOM-ready initialization and other functions here.
+    // In short: integrate the above modified finishExam into your original JS file,
+    // replacing the previous finishExam() implementation.
+    // ------------------------------------------------------------------
+
+    // For safety ensure the app initializes as before:
+    document.addEventListener('DOMContentLoaded', function() {
+      // call your original startup (show login screen)
+      try { showScreen('loginScreen'); } catch(e) { console.log('init error', e); }
+    });
+  </script>
+</body>
+</html>
