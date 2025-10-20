@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBT Siswa SMP - Sistem Ujian Online</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-full">
+    <div id="app" class="min-h-full">
+        <!-- Header -->
+        <header class="bg-white shadow-lg border-b-4 border-blue-500">
+            <div class="max-w-7xl mx-auto px-4 py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-blue-500 text-white p-3 rounded-lg">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-800">CBT Siswa SMP</h1>
+                            <p class="text-gray-600">Sistem Ujian Berbasis Komputer</p>
+                        </div>
+                    </div>
+                    <div id="timer" class="bg-red-100 text-red-800 px-4 py-2 rounded-lg font-mono text-lg hidden">
+                        <span id="timeDisplay">00:00</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-4xl mx-auto px-4 py-8">
+            <!-- Login Screen -->
+            <div id="loginScreen" class="fade-in">
+                <div class="bg-white rounded-xl shadow-xl p-8">
+                    <div class="text-center mb-8">
+                        <div class="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-10 h-10 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2">Login CBT SMP</h2>
+                        <p class="text-gray-600">Masukkan data Anda untuk memulai ujian</p>
+                    </div>
+
+                    <form id="loginForm" class="space-y-6">
+                        <div>
+                            <label for="studentName" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                            <input type="text" id="studentName" name="studentName" required 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                   placeholder="Masukkan nama lengkap Anda">
+                        </div>
+
+                        <div>
+                            <label for="studentId" class="block text-sm font-medium text-gray-700 mb-2">NIS/NISN</label>
+                            <input type="text" id="studentId" name="studentId" required 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                   placeholder="Masukkan NIS atau NISN">
+                        </div>
+
+                        <div>
+                            <label for="studentGrade" class="block text-sm font-medium text-gray-700 mb-2">Kelas</label>
+                            <select id="studentGrade" name="studentGrade" required 
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <option value="">Pilih Kelas</option>
+                                <option value="7">Kelas 7</option>
+                                <option value="8">Kelas 8</option>
+                                <option value="9">Kelas 9</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-200 transform hover:scale-105">
+                            Masuk ke Ujian
+                        </button>
+                    </form>
+
+                    <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-700">
+                                    <strong>Informasi Penting:</strong><br>
+                                    • Pastikan data yang dimasukkan benar<br>
+                                    • Soal akan disesuaikan dengan kelas yang dipilih<br>
+                                    • Ujian akan dimulai setelah login berhasil
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Start Screen -->
+            <div id="startScreen" class="hidden fade-in">
+                <div class="bg-white rounded-xl shadow-xl p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">Selamat Datang, <span id="welcomeName" class="text-blue-600"></span>!</h2>
+                            <p class="text-gray-600">Kelas <span id="welcomeGrade" class="font-semibold"></span> • NIS: <span id="welcomeId" class="font-mono"></span></p>
+                        </div>
+                        <button onclick="logout()" class="text-gray-500 hover:text-gray-700 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="text-center mb-8">
+                        <div class="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-10 h-10 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Siap Memulai Ujian?</h3>
+                        <p class="text-gray-600">Klik tombol di bawah untuk memulai ujian kelas <span id="examGrade" class="font-semibold"></span></p>
+                    </div>
+
+                    <div class="text-center mb-8">
+                        <button onclick="startExamFromLogin()" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            Mulai Ujian Kelas <span id="startButtonGrade"></span>
+                        </button>
+                    </div>
+
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-yellow-700">
+                                    <strong>Petunjuk Ujian:</strong><br>
+                                    • Pilih salah satu jawaban yang paling tepat<br>
+                                    • Waktu ujian akan dimulai setelah Anda klik "Mulai Ujian"<br>
+                                    • Pastikan koneksi internet stabil<br>
+                                    • Soal akan diambil sesuai dengan kelas Anda
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Screen -->
+            <div id="loadingScreen" class="hidden fade-in">
+                <div class="bg-white rounded-xl shadow-xl p-8 text-center">
+                    <div class="pulse-animation mb-4">
+                        <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
+                            <svg class="w-8 h-8 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Memuat Soal...</h3>
+                    <p class="text-gray-600">Mohon tunggu sebentar</p>
+                </div>
+            </div>
+
+            <!-- Exam Screen -->
+            <div id="examScreen" class="hidden fade-in">
+                <!-- Progress Bar -->
+                <div class="bg-white rounded-xl shadow-lg p-4 mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-gray-700">Progress Ujian</span>
+                        <span id="progressText" class="text-sm text-gray-500">1 dari 10</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 10%"></div>
+                    </div>
+                </div>
+
+                <!-- Question Card -->
+                <div class="bg-white rounded-xl shadow-xl p-8 mb-6">
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium" id="questionNumber">Soal 1</span>
+                            <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm" id="difficulty">Mudah</span>
+                        </div>
+                        <h3 id="questionText" class="text-xl font-semibold text-gray-800 mb-4 leading-relaxed">
+                            Loading question...
+                        </h3>
+                        
+                        <!-- Media Container -->
+                        <div id="mediaContainer" class="mb-6 hidden">
+                            <img id="questionImage" class="max-w-full h-auto rounded-lg shadow-md mb-4 hidden" alt="Gambar soal">
+                            <div id="questionVideo" class="mb-4 hidden">
+                                <video controls class="max-w-full h-auto rounded-lg shadow-md">
+                                    <source id="videoSource" src="" type="video/mp4">
+                                    Browser Anda tidak mendukung video.
+                                </video>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Answer Options -->
+                    <div class="space-y-3" id="answerOptions">
+                        <!-- Options will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="flex justify-between items-center">
+                    <button id="prevBtn" onclick="previousQuestion()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                        ← Sebelumnya
+                    </button>
+                    <button id="nextBtn" onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
+                        Selanjutnya →
+                    </button>
+                    <button id="finishBtn" onclick="finishExam()" class="hidden bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
+                        Selesai Ujian
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div id="resultsScreen" class="hidden fade-in">
+                <div class="bg-white rounded-xl shadow-xl p-8 text-center">
+                    <div class="mb-8">
+                        <div id="resultIcon" class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <!-- Icon will be set by JavaScript -->
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2">Ujian Selesai!</h2>
+                        <p class="text-gray-600 text-lg">Berikut adalah hasil ujian Anda</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-blue-50 p-6 rounded-xl">
+                            <div class="text-3xl font-bold text-blue-600 mb-2" id="totalQuestions">0</div>
+                            <div class="text-gray-600">Total Soal</div>
+                        </div>
+                        <div class="bg-green-50 p-6 rounded-xl">
+                            <div class="text-3xl font-bold text-green-600 mb-2" id="correctAnswers">0</div>
+                            <div class="text-gray-600">Jawaban Benar</div>
+                        </div>
+                        <div class="bg-purple-50 p-6 rounded-xl">
+                            <div class="text-3xl font-bold text-purple-600 mb-2" id="finalScore">0%</div>
+                            <div class="text-gray-600">Nilai Akhir</div>
+                        </div>
+                    </div>
+
+                    <button onclick="restartExam()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200">
+                        Ulangi Ujian
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error Screen -->
+            <div id="errorScreen" class="hidden fade-in">
+                <div class="bg-white rounded-xl shadow-xl p-8 text-center">
+                    <div class="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Terjadi Kesalahan</h3>
+                    <p class="text-gray-600 mb-6" id="errorMessage">Tidak dapat memuat soal dari database.</p>
+                    <button onclick="restartExam()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
+                        Coba Lagi
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Global variables
+        let currentGrade = null;
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let startTime = null;
+        let timerInterval = null;
+
+        // Google Sheets configuration
+        const SHEET_ID = '13_ai4mil0W4DbnjjXVMTN_kcEkIS8tzPlEw5y_rjfNI';
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/13_ai4mil0W4DbnjjXVMTN_kcEkIS8tzPlEw5y_rjfNI';
+        
+        // Google Apps Script Web App URL for handling sheet operations
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFetvh6HCMt1YxS3FVkuFovH85GkuL2js19MLB2HSyKYBLq3Bg9BkqJtECAdE-l0c/exec';
+
+        // Student data
+        let studentData = {
+            name: '',
+            id: '',
+            grade: null
+        };
+
+        // Screen management
+        function showScreen(screenId) {
+            const screens = ['loginScreen', 'startScreen', 'loadingScreen', 'examScreen', 'resultsScreen', 'errorScreen'];
+            screens.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('studentName').value.trim();
+            const id = document.getElementById('studentId').value.trim();
+            const grade = document.getElementById('studentGrade').value;
+            
+            if (!name || !id || !grade) {
+                showCustomAlert('Mohon lengkapi semua data!', 'error');
+                return;
+            }
+            
+            // Store student data
+            studentData = { name, id, grade: parseInt(grade) };
+            currentGrade = parseInt(grade);
+            
+            // Update welcome screen
+            document.getElementById('welcomeName').textContent = name;
+            document.getElementById('welcomeGrade').textContent = grade;
+            document.getElementById('welcomeId').textContent = id;
+            document.getElementById('examGrade').textContent = grade;
+            document.getElementById('startButtonGrade').textContent = grade;
+            
+            showScreen('startScreen');
+        });
+
+        // Start exam from login
+        function startExamFromLogin() {
+            showScreen('loadingScreen');
+            loadQuestions();
+        }
+
+        // Logout function
+        function logout() {
+            studentData = { name: '', id: '', grade: null };
+            currentGrade = null;
+            questions = [];
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            startTime = null;
+            stopTimer();
+            document.getElementById('timer').classList.add('hidden');
+            document.getElementById('loginForm').reset();
+            showScreen('loginScreen');
+        }
+
+        // Custom alert function (since we can't use browser alerts)
+        function showCustomAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
+                type === 'error' ? 'bg-red-100 border border-red-400 text-red-700' : 
+                type === 'success' ? 'bg-green-100 border border-green-400 text-green-700' :
+                'bg-blue-100 border border-blue-400 text-blue-700'
+            }`;
+            alertDiv.innerHTML = `
+                <div class="flex items-center">
+                    <span class="flex-1">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-gray-500 hover:text-gray-700">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Load questions from Google Sheets
+        async function loadQuestions() {
+            try {
+                showCustomAlert('Memuat soal dari Google Sheets...', 'info');
+                
+                const sheetName = `Kelas ${currentGrade}`;
+                let questionsFromSheet = [];
+                
+                try {
+                    // Method 1: Try direct CSV export from Google Sheets
+                    const csvUrl = `${SHEET_URL}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+                    const response = await fetch(csvUrl);
+                    
+                    if (response.ok) {
+                        const csvText = await response.text();
+                        questionsFromSheet = parseCSVToQuestions(csvText);
+                        
+                        if (questionsFromSheet.length > 0) {
+                            showCustomAlert(`✅ Berhasil memuat ${questionsFromSheet.length} soal dari sheet "${sheetName}"`, 'success');
+                        }
+                    }
+                } catch (fetchError) {
+                    console.log('Direct CSV fetch failed:', fetchError);
+                }
+                
+                // Method 2: Try Google Apps Script if direct method fails
+                if (questionsFromSheet.length === 0) {
+                    try {
+                        const scriptResponse = await fetch(APPS_SCRIPT_URL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                action: 'getQuestions',
+                                spreadsheetId: SHEET_ID,
+                                sheetName: sheetName
+                            })
+                        });
+                        
+                        if (scriptResponse.ok) {
+                            const scriptData = await scriptResponse.json();
+                            if (scriptData.success && scriptData.questions) {
+                                questionsFromSheet = scriptData.questions;
+                                showCustomAlert(`✅ Berhasil memuat ${questionsFromSheet.length} soal via Apps Script`, 'success');
+                            }
+                        }
+                    } catch (scriptError) {
+                        console.log('Apps Script method failed:', scriptError);
+                    }
+                }
+                
+                // Fallback: Use sample data if both methods fail
+                if (questionsFromSheet.length === 0) {
+                    questionsFromSheet = generateSampleQuestions(currentGrade);
+                    showCustomAlert(`⚠️ Menggunakan soal contoh untuk kelas ${currentGrade}. Periksa koneksi atau sheet "${sheetName}"`, 'info');
+                }
+                
+                // Simulate loading delay for better UX
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                questions = questionsFromSheet;
+                userAnswers = new Array(questions.length).fill(null);
+                
+                if (questions.length > 0) {
+                    startExam();
+                } else {
+                    showError(`Tidak ada soal tersedia untuk kelas ${currentGrade}. Pastikan sheet "${sheetName}" ada dan berisi soal.`);
+                }
+            } catch (error) {
+                console.error('Error loading questions:', error);
+                showError('Gagal memuat soal. Pastikan koneksi internet stabil dan sheet tersedia.');
+            }
+        }
+
+        // Parse CSV data to questions array
+        function parseCSVToQuestions(csvText) {
+            const lines = csvText.split('\n');
+            const questions = [];
+            
+            // Skip header row (index 0)
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                // Parse CSV line (handle quoted values)
+                const columns = parseCSVLine(line);
+                
+                if (columns.length >= 8) {
+                    const question = {
+                        no: parseInt(columns[0]) || i,
+                        kelas: parseInt(columns[1]) || currentGrade,
+                        pertanyaan: columns[2] || '',
+                        a: columns[3] || '',
+                        b: columns[4] || '',
+                        c: columns[5] || '',
+                        d: columns[6] || '',
+                        jawabanBenar: columns[7] || 'A',
+                        tingkatKesulitan: columns[8] || 'Sedang',
+                        linkGambar: columns[9] || '',
+                        linkVideo: columns[10] || ''
+                    };
+                    
+                    // Only add if question has content
+                    if (question.pertanyaan.trim()) {
+                        questions.push(question);
+                    }
+                }
+            }
+            
+            return questions;
+        }
+
+        // Parse a single CSV line handling quoted values
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            result.push(current.trim());
+            return result;
+        }
+
+        // Generate sample questions (fallback when Google Sheets is not accessible)
+        function generateSampleQuestions(grade) {
+            const difficulties = ['Mudah', 'Sedang', 'Sulit'];
+            const sampleQuestions = [];
+            
+            const subjects = {
+                7: {
+                    subject: 'Matematika',
+                    topics: ['Bilangan Bulat', 'Pecahan', 'Aljabar Dasar', 'Geometri']
+                },
+                8: {
+                    subject: 'IPA',
+                    topics: ['Gerak Lurus', 'Gaya dan Tekanan', 'Cahaya', 'Sistem Pernapasan']
+                },
+                9: {
+                    subject: 'Bahasa Indonesia',
+                    topics: ['Teks Laporan', 'Teks Diskusi', 'Cerpen', 'Puisi']
+                }
+            };
+            
+            const currentSubject = subjects[grade];
+            
+            for (let i = 1; i <= 15; i++) {
+                const topic = currentSubject.topics[(i - 1) % currentSubject.topics.length];
+                
+                let questionText, options, correctAnswer;
+                
+                if (grade === 7) {
+                    // Math questions for grade 7
+                    const num1 = i * 3;
+                    const num2 = i * 2;
+                    const result = num1 + num2;
+                    questionText = `Berapakah hasil dari ${num1} + ${num2}?`;
+                    options = [result, result + 1, result - 1, result + 2];
+                    correctAnswer = 'A';
+                } else if (grade === 8) {
+                    // Science questions for grade 8
+                    questionText = `Dalam topik ${topic}, manakah pernyataan yang benar?`;
+                    options = [
+                        `Pernyataan benar tentang ${topic}`,
+                        `Pernyataan salah A tentang ${topic}`,
+                        `Pernyataan salah B tentang ${topic}`,
+                        `Pernyataan salah C tentang ${topic}`
+                    ];
+                    correctAnswer = 'A';
+                } else {
+                    // Indonesian language questions for grade 9
+                    questionText = `Dalam ${topic}, ciri utama yang membedakannya adalah...`;
+                    options = [
+                        `Ciri utama ${topic} yang benar`,
+                        `Ciri yang salah A`,
+                        `Ciri yang salah B`,
+                        `Ciri yang salah C`
+                    ];
+                    correctAnswer = 'A';
+                }
+                
+                sampleQuestions.push({
+                    no: i,
+                    kelas: grade,
+                    pertanyaan: `${i}. ${questionText}`,
+                    a: options[0],
+                    b: options[1],
+                    c: options[2],
+                    d: options[3],
+                    jawabanBenar: correctAnswer,
+                    tingkatKesulitan: difficulties[i % 3],
+                    linkGambar: i % 6 === 0 ? 'https://via.placeholder.com/500x300/3B82F6/FFFFFF?text=Gambar+Soal+' + i : '',
+                    linkVideo: i % 8 === 0 ? 'https://www.w3schools.com/html/mov_bbb.mp4' : ''
+                });
+            }
+            
+            return sampleQuestions;
+        }
+
+        // Start exam
+        function startExam() {
+            currentQuestionIndex = 0;
+            startTime = new Date();
+            startTimer();
+            showScreen('examScreen');
+            displayQuestion();
+        }
+
+        // Timer functions
+        function startTimer() {
+            document.getElementById('timer').classList.remove('hidden');
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            if (!startTime) return;
+            
+            const now = new Date();
+            const elapsed = Math.floor((now - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            
+            document.getElementById('timeDisplay').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        // Display current question
+        function displayQuestion() {
+            const question = questions[currentQuestionIndex];
+            if (!question) return;
+
+            // Update question info
+            document.getElementById('questionNumber').textContent = `Soal ${currentQuestionIndex + 1}`;
+            document.getElementById('difficulty').textContent = question.tingkatKesulitan;
+            document.getElementById('questionText').textContent = question.pertanyaan;
+
+            // Update progress
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `${currentQuestionIndex + 1} dari ${questions.length}`;
+
+            // Handle media
+            const mediaContainer = document.getElementById('mediaContainer');
+            const questionImage = document.getElementById('questionImage');
+            const questionVideo = document.getElementById('questionVideo');
+            
+            mediaContainer.classList.add('hidden');
+            questionImage.classList.add('hidden');
+            questionVideo.classList.add('hidden');
+
+            if (question.linkGambar && question.linkGambar.trim()) {
+                questionImage.src = question.linkGambar;
+                questionImage.classList.remove('hidden');
+                mediaContainer.classList.remove('hidden');
+            }
+
+            if (question.linkVideo && question.linkVideo.trim()) {
+                document.getElementById('videoSource').src = question.linkVideo;
+                questionVideo.load();
+                questionVideo.classList.remove('hidden');
+                mediaContainer.classList.remove('hidden');
+            }
+
+            // Create answer options
+            const optionsContainer = document.getElementById('answerOptions');
+            optionsContainer.innerHTML = '';
+
+            const options = [
+                { key: 'A', text: question.a },
+                { key: 'B', text: question.b },
+                { key: 'C', text: question.c },
+                { key: 'D', text: question.d }
+            ];
+
+            options.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option-item';
+                
+                const isSelected = userAnswers[currentQuestionIndex] === option.key;
+                const baseClasses = 'w-full text-left p-4 rounded-lg border-2 transition-all duration-200 hover:bg-blue-50';
+                const selectedClasses = isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300';
+                
+                optionDiv.innerHTML = `
+                    <button onclick="selectAnswer('${option.key}')" class="${baseClasses} ${selectedClasses}">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full border-2 ${isSelected ? 'border-blue-500 bg-blue-500' : 'border-gray-300'} flex items-center justify-center mr-4">
+                                <span class="text-sm font-bold ${isSelected ? 'text-white' : 'text-gray-600'}">${option.key}</span>
+                            </div>
+                            <span class="text-gray-800">${option.text}</span>
+                        </div>
+                    </button>
+                `;
+                
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+            
+            if (currentQuestionIndex === questions.length - 1) {
+                document.getElementById('nextBtn').classList.add('hidden');
+                document.getElementById('finishBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('nextBtn').classList.remove('hidden');
+                document.getElementById('finishBtn').classList.add('hidden');
+            }
+        }
+
+        // Select answer
+        function selectAnswer(answer) {
+            userAnswers[currentQuestionIndex] = answer;
+            displayQuestion(); // Refresh to show selection
+        }
+
+        // Navigation functions
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        }
+
+        // Finish exam
+        function finishExam() {
+            stopTimer();
+            calculateResults();
+            showScreen('resultsScreen');
+            
+            // Auto-submit results to Google Sheets
+            submitResultsToSheet();
+        }
+
+        // Calculate and display results
+        function calculateResults() {
+            let correctCount = 0;
+            
+            for (let i = 0; i < questions.length; i++) {
+                if (userAnswers[i] === questions[i].jawabanBenar) {
+                    correctCount++;
+                }
+            }
+            
+            const percentage = Math.round((correctCount / questions.length) * 100);
+            
+            // Update result display
+            document.getElementById('totalQuestions').textContent = questions.length;
+            document.getElementById('correctAnswers').textContent = correctCount;
+            document.getElementById('finalScore').textContent = `${percentage}%`;
+            
+            // Set result icon based on score
+            const resultIcon = document.getElementById('resultIcon');
+            if (percentage >= 80) {
+                resultIcon.className = 'bg-green-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4';
+                resultIcon.innerHTML = '<svg class="w-12 h-12 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>';
+            } else if (percentage >= 60) {
+                resultIcon.className = 'bg-yellow-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4';
+                resultIcon.innerHTML = '<svg class="w-12 h-12 text-yellow-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>';
+            } else {
+                resultIcon.className = 'bg-red-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4';
+                resultIcon.innerHTML = '<svg class="w-12 h-12 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>';
+            }
+        }
+
+        // Submit results to Google Sheets
+        async function submitResultsToSheet() {
+            try {
+                showCustomAlert('Menyimpan hasil ujian ke Google Sheets...', 'info');
+                
+                // Calculate final results
+                let correctCount = 0;
+                for (let i = 0; i < questions.length; i++) {
+                    if (userAnswers[i] === questions[i].jawabanBenar) {
+                        correctCount++;
+                    }
+                }
+                const percentage = Math.round((correctCount / questions.length) * 100);
+                
+                // Calculate exam duration
+                const endTime = new Date();
+                const durationMinutes = Math.round((endTime - startTime) / 60000);
+                
+                // Prepare result data matching exact column structure
+                const resultData = {
+                    timestamp: new Date().toLocaleString('id-ID', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    }),
+                    nama: studentData.name,
+                    nis: studentData.id,
+                    kelas: studentData.grade,
+                    totalSoal: questions.length,
+                    jawabanBenar: correctCount,
+                    jawabanSalah: questions.length - correctCount,
+                    nilaiAkhir: percentage,
+                    durasi: `${durationMinutes} menit`,
+                    status: percentage >= 75 ? 'LULUS' : 'TIDAK LULUS'
+                };
+                
+                // Submit to Google Sheets (will create sheet if not exists)
+                const success = await submitToGoogleSheets(resultData);
+                
+                if (success) {
+                    showCustomAlert('✅ Hasil ujian berhasil disimpan ke Google Sheets!', 'success');
+                    showResultSubmissionSuccess(`Hasil Ujian Kelas ${studentData.grade}`, resultData);
+                } else {
+                    showCustomAlert('❌ Gagal menyimpan ke Google Sheets. Periksa koneksi internet.', 'error');
+                    showManualSubmissionInstructions(`Hasil Ujian Kelas ${studentData.grade}`, '', resultData);
+                }
+                
+            } catch (error) {
+                console.error('Error submitting results:', error);
+                showCustomAlert('❌ Terjadi kesalahan saat menyimpan hasil ujian', 'error');
+                showManualSubmissionInstructions(`Hasil Ujian Kelas ${studentData.grade}`, '', resultData);
+            }
+        }
+
+        // Submit to Google Sheets (creates new sheet automatically if not exists)
+        async function submitToGoogleSheets(resultData) {
+            try {
+                const sheetName = `Hasil Ujian Kelas ${studentData.grade}`;
+                
+                // Prepare data for Google Sheets - exact column order
+                const headerRow = [
+                    'Timestamp', 'Nama', 'NIS', 'Kelas', 'Total Soal', 'Jawaban Benar', 
+                    'Jawaban Salah', 'Nilai Akhir (%)', 'Durasi', 'Status'
+                ];
+                
+                const dataRow = [
+                    resultData.timestamp,
+                    resultData.nama,
+                    resultData.nis,
+                    resultData.kelas,
+                    resultData.totalSoal,
+                    resultData.jawabanBenar,
+                    resultData.jawabanSalah,
+                    resultData.nilaiAkhir,
+                    resultData.durasi,
+                    resultData.status
+                ];
+                
+                // Primary method: Use Google Apps Script to handle sheet creation and data insertion
+                try {
+                    const success = await submitViaAppsScript(sheetName, headerRow, dataRow);
+                    if (success) {
+                        return true;
+                    }
+                } catch (error) {
+                    console.log('Apps Script submission failed:', error);
+                }
+                
+                // Fallback method: Try direct sheet append (requires existing sheet)
+                try {
+                    const success = await appendToExistingSheet(sheetName, dataRow);
+                    if (success) {
+                        return true;
+                    }
+                } catch (error) {
+                    console.log('Direct append failed:', error);
+                }
+                
+                // If all methods fail, return false for manual handling
+                return false;
+                
+            } catch (error) {
+                console.error('Failed to submit to Google Sheets:', error);
+                return false;
+            }
+        }
+
+        // Primary method: Submit via Google Apps Script (handles sheet creation automatically)
+        async function submitViaAppsScript(sheetName, headerRow, dataRow) {
+            try {
+                const payload = {
+                    action: 'submitResult',
+                    spreadsheetId: SHEET_ID,
+                    sheetName: sheetName,
+                    headers: headerRow,
+                    data: dataRow,
+                    createIfNotExists: true
+                };
+                
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        console.log('Successfully submitted via Apps Script:', result);
+                        if (result.sheetCreated) {
+                            showCustomAlert(`✅ Sheet "${sheetName}" dibuat dan data disimpan!`, 'success');
+                        } else {
+                            showCustomAlert(`✅ Data berhasil ditambahkan ke sheet "${sheetName}"!`, 'success');
+                        }
+                        return true;
+                    } else {
+                        console.error('Apps Script returned error:', result.error);
+                        return false;
+                    }
+                } else {
+                    console.error('Apps Script request failed:', response.status);
+                    return false;
+                }
+                
+            } catch (error) {
+                console.error('Error submitting via Apps Script:', error);
+                return false;
+            }
+        }
+
+        // Fallback method: Try direct append to existing sheet
+        async function appendToExistingSheet(sheetName, dataRow) {
+            try {
+                // Try using Google Sheets public API for appending data
+                const range = `${sheetName}!A:J`;
+                const appendUrl = `${SHEET_URL}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}&range=A1:A1`;
+                
+                // First check if sheet exists by trying to read it
+                const checkResponse = await fetch(appendUrl);
+                if (!checkResponse.ok) {
+                    console.log(`Sheet "${sheetName}" does not exist`);
+                    return false;
+                }
+                
+                // If sheet exists, try to append via form submission method
+                const formData = new FormData();
+                formData.append('entry.timestamp', dataRow[0]);
+                formData.append('entry.nama', dataRow[1]);
+                formData.append('entry.nis', dataRow[2]);
+                formData.append('entry.kelas', dataRow[3]);
+                formData.append('entry.totalSoal', dataRow[4]);
+                formData.append('entry.jawabanBenar', dataRow[5]);
+                formData.append('entry.jawabanSalah', dataRow[6]);
+                formData.append('entry.nilaiAkhir', dataRow[7]);
+                formData.append('entry.durasi', dataRow[8]);
+                formData.append('entry.status', dataRow[9]);
+                
+                // This is a fallback method that may not work without proper form setup
+                console.log('Attempting fallback append method...');
+                return false; // Return false to trigger manual instructions
+                
+            } catch (error) {
+                console.error('Error in fallback append method:', error);
+                return false;
+            }
+        }
+
+        // Add Google Apps Script code template for admin
+        function showAppsScriptSetup() {
+            const setupDiv = document.createElement('div');
+            setupDiv.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            setupDiv.innerHTML = `
+                <div class="bg-white rounded-xl shadow-2xl p-8 max-w-4xl mx-4 max-h-96 overflow-y-auto">
+                    <div class="text-center mb-6">
+                        <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">🔧 Setup Google Apps Script</h3>
+                        <p class="text-gray-600 mb-4">Untuk mengaktifkan penyimpanan otomatis, setup Google Apps Script berikut:</p>
+                    </div>
+                    
+                    <div class="text-left space-y-4 mb-6">
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-800 mb-2">📝 Langkah Setup:</h4>
+                            <ol class="list-decimal list-inside text-sm text-gray-700 space-y-1">
+                                <li>Buka <a href="https://script.google.com" target="_blank" class="text-blue-600 underline">Google Apps Script</a></li>
+                                <li>Buat project baru</li>
+                                <li>Copy-paste kode di bawah</li>
+                                <li>Deploy sebagai Web App</li>
+                                <li>Update URL di sistem CBT</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-800 mb-2">📄 Kode Google Apps Script:</h4>
+                            <textarea readonly class="w-full h-32 text-xs font-mono bg-white border rounded p-2 resize-none" onclick="this.select()">
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const spreadsheetId = data.spreadsheetId;
+    const sheetName = data.sheetName;
+    
+    if (data.action === 'submitResult') {
+      return submitResult(spreadsheetId, sheetName, data.headers, data.data, data.createIfNotExists);
+    } else if (data.action === 'getQuestions') {
+      return getQuestions(spreadsheetId, sheetName);
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify({success: false, error: 'Unknown action'}));
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({success: false, error: error.toString()}));
+  }
+}
+
+function submitResult(spreadsheetId, sheetName, headers, data, createIfNotExists) {
+  try {
+    const spreadsheet = SpreadsheetApp.openById(spreadsheetId);
+    let sheet = spreadsheet.getSheetByName(sheetName);
+    let sheetCreated = false;
+    
+    if (!sheet && createIfNotExists) {
+      sheet = spreadsheet.insertSheet(sheetName);
+      sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+      sheetCreated = true;
+    }
+    
+    if (sheet) {
+      const lastRow = sheet.getLastRow();
+      sheet.getRange(lastRow + 1, 1, 1, data.length).setValues([data]);
+      
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true, 
+        sheetCreated: sheetCreated,
+        message: 'Data berhasil disimpan'
+      }));
+    } else {
+      return ContentService.createTextOutput(JSON.stringify({
+        success: false, 
+        error: 'Sheet tidak ditemukan'
+      }));
+    }
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      success: false, 
+      error: error.toString()
+    }));
+  }
+}
+
+function getQuestions(spreadsheetId, sheetName) {
+  try {
+    const spreadsheet = SpreadsheetApp.openById(spreadsheetId);
+    const sheet = spreadsheet.getSheetByName(sheetName);
+    
+    if (!sheet) {
+      return ContentService.createTextOutput(JSON.stringify({
+        success: false, 
+        error: 'Sheet tidak ditemukan'
+      }));
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    const questions = [];
+    
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      if (row[2]) { // Check if question exists
+        questions.push({
+          no: row[0] || i,
+          kelas: row[1] || 7,
+          pertanyaan: row[2] || '',
+          a: row[3] || '',
+          b: row[4] || '',
+          c: row[5] || '',
+          d: row[6] || '',
+          jawabanBenar: row[7] || 'A',
+          tingkatKesulitan: row[8] || 'Sedang',
+          linkGambar: row[9] || '',
+          linkVideo: row[10] || ''
+        });
+      }
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      success: true, 
+      questions: questions
+    }));
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      success: false, 
+      error: error.toString()
+    }));
+  }
+}
+                            </textarea>
+                            <p class="text-xs text-gray-600 mt-1">📋 Klik untuk memilih semua kode</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <button onclick="window.open('https://script.google.com', '_blank')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+                            🔗 Buka Google Apps Script
+                        </button>
+                        <button onclick="this.closest('.fixed').remove()" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(setupDiv);
+        }
+
+
+
+        // Show manual submission instructions
+        function showManualSubmissionInstructions(sheetName, csvContent, resultData) {
+            const instructionDiv = document.createElement('div');
+            instructionDiv.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            // Create manual data entry format
+            const manualData = `${resultData.timestamp}\t${resultData.nama}\t${resultData.nis}\t${resultData.kelas}\t${resultData.totalSoal}\t${resultData.jawabanBenar}\t${resultData.jawabanSalah}\t${resultData.nilaiAkhir}\t${resultData.durasi}\t${resultData.status}`;
+            
+            instructionDiv.innerHTML = `
+                <div class="bg-white rounded-xl shadow-2xl p-8 max-w-3xl mx-4 max-h-96 overflow-y-auto">
+                    <div class="text-center mb-6">
+                        <div class="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">⚠️ Penyimpanan Manual Diperlukan</h3>
+                        <p class="text-gray-600 mb-4">Sistem tidak dapat menyimpan otomatis. Silakan input manual ke Google Sheets:</p>
+                    </div>
+                    
+                    <div class="text-left space-y-4 mb-6">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-800 mb-2">📊 Ringkasan Hasil Ujian:</h4>
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <div><strong>Nama:</strong> ${resultData.nama}</div>
+                                <div><strong>Kelas:</strong> ${resultData.kelas}</div>
+                                <div><strong>NIS:</strong> ${resultData.nis}</div>
+                                <div><strong>Nilai:</strong> ${resultData.nilaiAkhir}%</div>
+                                <div><strong>Status:</strong> <span class="${resultData.status === 'LULUS' ? 'text-green-600' : 'text-red-600'} font-semibold">${resultData.status}</span></div>
+                                <div><strong>Durasi:</strong> ${resultData.durasi}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-800 mb-2">📝 Langkah Input Manual:</h4>
+                            <ol class="list-decimal list-inside text-sm text-gray-700 space-y-1">
+                                <li>Klik "Buka Google Sheets" di bawah</li>
+                                <li>Cari atau buat sheet: <strong>"${sheetName}"</strong></li>
+                                <li>Jika sheet belum ada, buat dengan header: <br><code class="bg-gray-200 px-1 rounded text-xs">Timestamp | Nama | NIS | Kelas | Total Soal | Jawaban Benar | Jawaban Salah | Nilai Akhir (%) | Durasi | Status</code></li>
+                                <li>Copy data di bawah dan paste ke baris kosong berikutnya</li>
+                                <li>Simpan spreadsheet</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-800 mb-2">📄 Data Siap Copy (Tab-separated):</h4>
+                            <textarea readonly class="w-full h-20 text-xs font-mono bg-white border rounded p-2 resize-none" onclick="this.select(); document.execCommand('copy'); showCustomAlert('Data berhasil di-copy!', 'success')">${manualData}</textarea>
+                            <p class="text-xs text-gray-600 mt-1">📋 Klik untuk copy otomatis, lalu paste di Google Sheets</p>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <h4 class="font-semibold text-gray-800 mb-2 text-sm">🔧 Troubleshooting:</h4>
+                            <ul class="text-xs text-gray-600 space-y-1">
+                                <li>• Pastikan Anda memiliki akses edit ke spreadsheet</li>
+                                <li>• Periksa koneksi internet Anda</li>
+                                <li>• Coba refresh halaman jika masih bermasalah</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <button onclick="openGoogleSheets()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+                            🔗 Buka Google Sheets
+                        </button>
+                        <button onclick="copyDataToClipboard('${manualData.replace(/'/g, "\\'")}'); showCustomAlert('Data berhasil di-copy ke clipboard!', 'success');" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            📋 Copy Data ke Clipboard
+                        </button>
+                        <button onclick="this.closest('.fixed').remove()" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(instructionDiv);
+        }
+
+        // Show result submission success
+        function showResultSubmissionSuccess(sheetName, resultData) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            successDiv.innerHTML = `
+                <div class="bg-white rounded-xl shadow-2xl p-8 max-w-lg mx-4">
+                    <div class="text-center">
+                        <div class="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-10 h-10 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">🎉 Berhasil Tersimpan!</h3>
+                        <p class="text-gray-600 mb-4">Hasil ujian telah otomatis disimpan ke Google Sheets</p>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-semibold text-gray-800 mb-2">📊 Detail Penyimpanan:</h4>
+                            <div class="text-sm text-left space-y-1">
+                                <div><strong>Sheet:</strong> <span class="font-mono text-xs bg-gray-200 px-1 rounded">${sheetName}</span></div>
+                                <div><strong>Siswa:</strong> ${resultData.nama} (${resultData.nis})</div>
+                                <div><strong>Kelas:</strong> ${resultData.kelas}</div>
+                                <div><strong>Nilai:</strong> ${resultData.nilaiAkhir}% - <span class="${resultData.status === 'LULUS' ? 'text-green-600' : 'text-red-600'} font-semibold">${resultData.status}</span></div>
+                                <div><strong>Waktu:</strong> ${resultData.timestamp}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-50 border border-green-200 p-3 rounded-lg mb-4">
+                            <p class="text-sm text-green-800">
+                                ✅ Data telah tersimpan dengan kolom:<br>
+                                <span class="font-mono text-xs">Timestamp, Nama, NIS, Kelas, Total Soal, Jawaban Benar, Jawaban Salah, Nilai Akhir (%), Durasi, Status</span>
+                            </p>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <button onclick="openGoogleSheets()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+                                🔗 Lihat di Google Sheets
+                            </button>
+                            <button onclick="this.closest('.fixed').remove()" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(successDiv);
+        }
+
+        // Copy data to clipboard
+        function copyDataToClipboard(data) {
+            try {
+                // Modern clipboard API
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(data);
+                } else {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = data;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    textArea.style.top = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    document.execCommand('copy');
+                    textArea.remove();
+                }
+            } catch (error) {
+                console.error('Failed to copy to clipboard:', error);
+            }
+        }
+
+        // Open Google Sheets in new tab
+        function openGoogleSheets() {
+            const sheetUrl = SHEET_URL + '/edit?gid=0#gid=0';
+            window.open(sheetUrl, '_blank', 'noopener,noreferrer');
+        }
+
+        // Show error
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            showScreen('errorScreen');
+        }
+
+        // Restart exam
+        function restartExam() {
+            // Keep student data but reset exam state
+            questions = [];
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            startTime = null;
+            stopTimer();
+            document.getElementById('timer').classList.add('hidden');
+            
+            // Go back to start screen if logged in, otherwise go to login
+            if (studentData.name && studentData.grade) {
+                showScreen('startScreen');
+            } else {
+                showScreen('loginScreen');
+            }
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            showScreen('loginScreen');
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9917d4bdd386fdee',t:'MTc2MDk1NjEzNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
